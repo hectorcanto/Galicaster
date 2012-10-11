@@ -88,5 +88,9 @@ gobject.signal_new('create-mock-mp', Dispatcher, gobject.SIGNAL_RUN_LAST, gobjec
 gobject.signal_new('start-operation', Dispatcher, gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, (gobject.TYPE_PYOBJECT,gobject.TYPE_PYOBJECT,) )
 gobject.signal_new('stop-operation', Dispatcher, gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, (gobject.TYPE_PYOBJECT,gobject.TYPE_PYOBJECT,gobject.TYPE_PYOBJECT) )
 
+#NEW on 1.2.1x
+gobject.signal_new('cut-record', Dispatcher, gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, () )
+
+
 
 

@@ -470,8 +470,7 @@ class RecorderClassUI(gtk.Box):
 			}
         buttons = None
         self.error_dialog = message.PopUp(message.ERROR, text, 
-                                context.get_mainwindow(), buttons)
-        
+                                context.get_mainwindow(), buttons)        
 
 
     def on_recover_from_error(self, origin):
@@ -746,6 +745,10 @@ class RecorderClassUI(gtk.Box):
             self.statusbar.SetVideo(None,self.mediapackage.metadata_episode['title'])
             self.statusbar.SetPresenter(None,self.mediapackage.creators)
         #self.change_state(self.previous)  
+        return True 
+
+    def on_cut(self,button):
+        self.dispatcher.emit("cut-record")
         return True 
 
     def show_next(self,button=None,tipe = None):   

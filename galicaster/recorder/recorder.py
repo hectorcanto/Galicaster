@@ -79,7 +79,7 @@ class Recorder(object):
                 Klass = getattr(mod, "GC" + bin['device'])
             except:
                 raise NameError(
-                    'Invalid track type %s for %s track' % (mod_name, name)
+                    'Invalid track type {0} for {1} track'.format(mod_name, name)
                     )
 
             log.debug("Init bin %s %s", name, mod_name)
@@ -99,6 +99,7 @@ class Recorder(object):
             return False
         else:
             change=self.pipeline.set_state(gst.STATE_PAUSED)
+            self.dispatcher.connect('cut-record',self.create_discon)
             
             if change == gst.STATE_CHANGE_FAILURE:
                 text = None
@@ -278,4 +279,9 @@ class Recorder(object):
         for bin_name, bin in self.bins.iteritems():
             if bin.has_audio:
                 bin.mute_preview(value)
-                
+
+
+    def create_discon(self, origin):
+        for bin_name, bin in self.bins.iteritems():
+             bin.cutFile()
+        return True
