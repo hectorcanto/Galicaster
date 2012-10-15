@@ -180,10 +180,9 @@ class GCstream(gst.Bin, base.Base):
         identity= self.get_by_name('id-{0}'.format(branch_type))
         a = gst.structure_from_string('close_file')
         event = gst.event_new_custom(gst.EVENT_EOS, a)
-        identity.send_event(event)
         branch=self.get_by_name(branch_type)
-        branch.change_state(gst.STATE_NULL)
-        branch.get_state()
+        branch.send_event(event) 
+        branch.set_state(gst.STATE_NULL)sprints
         self.bin_start.unlink(branch)
         self.remove(branch)
         location=path.join(self.options['path'],str(self.file_number)+self.options['file'])
@@ -196,17 +195,13 @@ class GCstream(gst.Bin, base.Base):
 
 
     def changeShift(self, value, valve):
-        print valve,"shifting to ", value
         valve1=self.get_by_name('gc-{0}-shift-{1}'.format(class_name,valve))
         valve1.set_property('drop', value)
 
-    def changeValve(self, value):
-        print "change Valve to",value
-     
+    def changeValve(self, value):     
         valve1=self.get_by_name('gc-{0}-shift-even'.format(class_name))
         valve1.set_property('drop', value)
         if value:
-            print "The same to the other valve"
             valve1=self.get_by_name('gc-{0}-shift-odd'.format(class_name))
             valve1.set_property('drop', value)
 
