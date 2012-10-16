@@ -100,6 +100,8 @@ class Recorder(object):
         else:
             change=self.pipeline.set_state(gst.STATE_PAUSED)
             self.dispatcher.connect('cut-record',self.create_discon)
+            self.dispatcher.connect('start-streaming',self.shift_streaming, False)
+            self.dispatcher.connect('stop-streaming',self.shift_streaming, True)
             
             if change == gst.STATE_CHANGE_FAILURE:
                 text = None
@@ -285,3 +287,9 @@ class Recorder(object):
         for bin_name, bin in self.bins.iteritems():
              bin.cutFile()
         return True
+
+    def shift_streaming(self, origin,value):
+        for bin_name, bin in self.bins.iteritems():
+             bin.changeStream(value)
+        return True
+

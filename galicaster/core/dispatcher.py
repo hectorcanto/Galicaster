@@ -90,7 +90,8 @@ gobject.signal_new('stop-operation', Dispatcher, gobject.SIGNAL_RUN_LAST, gobjec
 
 #NEW on 1.2.1x
 gobject.signal_new('cut-record', Dispatcher, gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, () )
-
+gobject.signal_new('start-streaming', Dispatcher, gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, () )
+gobject.signal_new('stop-streaming', Dispatcher, gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, () )
 
 
 

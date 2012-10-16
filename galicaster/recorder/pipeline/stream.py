@@ -34,8 +34,12 @@ pipestr = """
  tee name=tee-first  ! queue !  xvimagesink async=false qos=false name=gc-{0}-preview
  tee-first. ! queue ! valve drop=false name=gc-{0}-shift-even ! identity name=id-even 
  tee-first. ! queue ! valve drop=false name=gc-{0}-shift-odd ! identity name=id-odd 
-
+ tee-first. ! queue ! valve drop=false name=gc-{0}-valve-stream ! ffmpegcolorspace !
+ x264enc pass=pass1 threads=2 bitrate=400 tune=zerolatency ! queue ! flvmux name=mux ! 
+ queue ! rtmpsink name=gc-{0}-streaming-snk location='rtmp://172.20.209.171/live/cmar  
 """.format(class_name)
+
+#   pulsesrc ! audioconvert ! audiorate ! audioresample ! faac bitrate=96000 ! audio/mpeg,mpegversion=4,stream-format=raw ! mux.
 
 # xvidenc bitrate=50000000 ! queue ! avimux ! 
 
@@ -166,25 +170,23 @@ class GCstream(gst.Bin, base.Base):
 
 
     def cutFile(self):
+        # change Valves
+        branch_type='odd' if self.file_number%2 else 'even'
+        other_branch='odd' if branch_type=='even' else 'even'
 
-        if self.file_number%2: # odd 1 3 5
-            self.changeShift(True,'odd')
-            self.changeShift(False,'even')
-            branch_type='odd'
+        self.changeShift(False,other_branch)
+        self.changeShift(True,branch_type)        
 
-        else: # even 0 2 4
-            self.changeShift(True,'even')
-            self.changeShift(False,'odd')
-            branch_type='even'
-
-        identity= self.get_by_name('id-{0}'.format(branch_type))
+        #send eos and remove branch
         a = gst.structure_from_string('close_file')
         event = gst.event_new_custom(gst.EVENT_EOS, a)
         branch=self.get_by_name(branch_type)
         branch.send_event(event) 
-        branch.set_state(gst.STATE_NULL)sprints
+        branch.set_state(gst.STATE_NULL)
         self.bin_start.unlink(branch)
         self.remove(branch)
+
+        #reinstate branch
         location=path.join(self.options['path'],str(self.file_number)+self.options['file'])
         self.file_number+=1
         new_branch = RecordBranch(branch_type,location)
@@ -192,18 +194,23 @@ class GCstream(gst.Bin, base.Base):
         self.bin_start.link(new_branch)
         new_branch.set_state(gst.STATE_PLAYING)
 
-
-
     def changeShift(self, value, valve):
         valve1=self.get_by_name('gc-{0}-shift-{1}'.format(class_name,valve))
         valve1.set_property('drop', value)
 
     def changeValve(self, value):     
         valve1=self.get_by_name('gc-{0}-shift-even'.format(class_name))
+        #valve2=self.get_by_name('gc-{0}-valve-stream'.format(class_name))
         valve1.set_property('drop', value)
+        #valve2.set_property('drop', value)
+
         if value:
             valve1=self.get_by_name('gc-{0}-shift-odd'.format(class_name))
             valve1.set_property('drop', value)
+
+    def changeStream(self, value):     
+        valve1=self.get_by_name('gc-{0}-valve-stream'.format(class_name))
+        #valve1.set_property('drop', value)
 
     def getVideoSink(self):
         return self.get_by_name('gc-{0}-preview'.format(class_name))
