@@ -79,6 +79,7 @@ class GCfirewire(gst.Bin, base.Base):
     is_pausable = False
     has_audio   = True
     has_video   = True
+    has_stream = False
     
     __gstdetails__ = (
         "Galicaster Firewire BIN",

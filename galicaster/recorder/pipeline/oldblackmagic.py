@@ -118,6 +118,7 @@ class GColdblackmagic(gst.Bin, base.Base):
   is_pausable = True
   has_audio    = False
   has_video    = True
+  has_stream = False
     
   __gstdetails__ = (
         "Galicaster blackmagic Bin",

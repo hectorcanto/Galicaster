@@ -75,6 +75,7 @@ class GCpulse(gst.Bin, base.Base):
     is_pausable = True
     has_audio   = True
     has_video   = False
+    has_stream = False
     
     __gstdetails__ = (
         "Galicaster Audio BIN",

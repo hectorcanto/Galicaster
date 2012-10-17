@@ -388,7 +388,10 @@ class Profile(object):
       for track in self.tracks:
          if track.device not in ['pulse', 'audiotest']:
             areas[index] = track.name
-            index +=1                             
+            index +=1
+         if 'areas' in track:
+            areas[index] = track.name+'2'            
+            index +=1        
       return areas
 
 

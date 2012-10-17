@@ -93,6 +93,7 @@ class GCv4l2(gst.Bin, base.Base):
     is_pausable = True
     has_audio   = False
     has_video   = True
+    has_stream = False
 
     __gstdetails__ = (
         "Galicaster V4L2 Bin",

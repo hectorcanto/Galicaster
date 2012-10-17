@@ -468,9 +468,9 @@ gobject.type_register(ListingClassUI)
 
 def main(args):
 	"""Launcher for development purposes"""
-    v = listing()
-    gtk.main()
-    return 0
+	v = listing()
+	gtk.main()
+	return 0
 
 if __name__ == '__main__':
-    sys.exit(main(sys.argv)) 
+	sys.exit(main(sys.argv)) 

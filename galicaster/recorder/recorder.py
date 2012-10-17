@@ -83,7 +83,10 @@ class Recorder(object):
                     )
 
             log.debug("Init bin %s %s", name, mod_name)
-            self.bins[name] = Klass(bin)
+            obj = Klass(bin)
+            self.bins[name] = obj
+            if obj.has_stream:
+                self.bins_desc=obj.update_bins_desc(self.bins_desc)
             self.pipeline.add(self.bins[name])
 
     def get_status(self):
