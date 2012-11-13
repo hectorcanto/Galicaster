@@ -146,7 +146,7 @@ class Worker(object):
         self.dispatcher.emit('start-operation', 'ingest', mp)
         self.dispatcher.emit('refresh-row', mp.identifier)
 
-        ifile = tempfile.NamedTemporaryFile(dir=self.tmp_path)
+        ifile = tempfile.NamedTemporaryFile(dir=self.tmp_path, suffix='.zip')
         self._export_to_zip(mp, ifile, False)
 
         if mp.manual:
@@ -172,7 +172,7 @@ class Worker(object):
                 if k[0:36] == 'org.opencastproject.workflow.config.':
                     workflow_parameters[k[36:]] = v
             try:
-                self.mh_client.ingest(ifile.name, workflow, mp.getIdentifier(), workflow_parameters)
+                self.mh_client.ingest(ifile.name, workflow, mp.properties['workflow_id'], workflow_parameters)
                 logger.info("Finalized Ingest for MP {0}".format(mp.getIdentifier()))
                 mp.setOpStatus("ingest",mediapackage.OP_DONE)
                 self.dispatcher.emit('stop-operation', 'ingest', mp, True)
@@ -189,14 +189,14 @@ class Worker(object):
 
     def export_to_zip(self, mp, location=None):
         logger.info('Creating ExportToZIP Job for MP {0}'.format(mp.getIdentifier()))
-        if not location:
-            name = datetime.now().replace(microsecond=0).isoformat()
-            location = location or os.path.join(self.export_path, name + '.zip')
         mp.setOpStatus('exporttozip',mediapackage.OP_PENDING)
         self.jobs.put((self._export_to_zip, (mp, location)))
 
 
-    def _export_to_zip(self, mp, location, is_action=True):
+    def _export_to_zip(self, mp, location=None, is_action=True):
+        if not location:
+            name = datetime.now().replace(microsecond=0).isoformat()
+            location = location or os.path.join(self.export_path, name + '.zip')
         if is_action:
             logger.info("Executing ExportToZIP for MP {0}".format(mp.getIdentifier()))
             mp.setOpStatus('exporttozip',mediapackage.OP_PROCESSING)
@@ -222,17 +222,16 @@ class Worker(object):
 
     def side_by_side(self, mp, location=None):
         logger.info('Creating SideBySide Job for MP {0}'.format(mp.getIdentifier()))
-        if not location:
-            name = datetime.now().replace(microsecond=0).isoformat()
-            location = location or os.path.join(self.export_path, name + '.mp4')
-
         mp.setOpStatus('sidebyside',mediapackage.OP_PENDING)
         self.jobs.put((self._side_by_side, (mp, location)))
 
 
-    def _side_by_side(self, mp, location):
+    def _side_by_side(self, mp, location=None):
         logger.info('Executing SideBySide for MP {0}'.format(mp.getIdentifier()))
         mp.setOpStatus('sidebyside',mediapackage.OP_PROCESSING)
+        if not location:
+            name = datetime.now().replace(microsecond=0).isoformat()
+            location = location or os.path.join(self.export_path, name + '.mp4')
         self.repo.update(mp)
         self.dispatcher.emit('start-operation', 'sidebyside', mp)
 
